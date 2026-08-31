@@ -1,12 +1,17 @@
 import { useEffect } from "react"
 import { initHeroAnimation } from "./animations/hero"
-
+import Process from "./components/Process"
+import { initProcessAnimation } from "./animations/process"
 function App() {
   useEffect(() => {
-    const cleanup = initHeroAnimation()
+  const cleanupHero = initHeroAnimation()
+  const cleanupProcess = initProcessAnimation()
 
-    return cleanup
-  }, [])
+  return () => {
+    cleanupHero()
+    cleanupProcess()
+  }
+}, [])
 
   return (
     <main>
@@ -41,19 +46,7 @@ function App() {
         </div>
       </section>
 
-      <section className="process-section">
-        <div className="process-intro">
-          <p className="section-label">THE WAY I BUILD</p>
-
-          <h2>
-            IDEA
-            <span>→</span>
-            CODE
-            <span>→</span>
-            PRODUCT
-          </h2>
-        </div>
-      </section>
+      <Process />
     </main>
   )
 }

@@ -231,9 +231,11 @@ body {
 .process-step {
   position: absolute;
   top: 50%;
-  width: min(34vw, 430px);
+  width: min(32vw, 460px);
   transform: translateY(-50%);
-  opacity: 0.12;
+  opacity: 0;
+  visibility: hidden;
+  will-change: transform, opacity;
 }
 
 .process-step-left {
@@ -254,18 +256,18 @@ body {
 }
 
 .process-step h2 {
-  margin-bottom: 18px;
-  font-size: clamp(3rem, 6vw, 6.5rem);
-  line-height: 0.85;
+  margin-bottom: 20px;
+  font-size: clamp(3.5rem, 6vw, 7rem);
+  line-height: 0.82;
   font-weight: 700;
-  letter-spacing: -0.07em;
+  letter-spacing: -0.075em;
 }
 
 .process-description {
   max-width: 380px;
   font-size: 14px;
   line-height: 1.6;
-  color: rgba(244, 244, 244, 0.55);
+  color: rgba(244, 244, 244, 0.6);
 }
 
 .process-step-left .process-description {
@@ -290,6 +292,24 @@ body {
   font-size: 9px;
   letter-spacing: 0.08em;
   color: rgba(244, 244, 244, 0.4);
+}
+.process-step::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 10vw;
+  height: 1px;
+  background: rgba(244, 244, 244, 0.22);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.process-step-left::after {
+  right: -10vw;
+}
+
+.process-step-right::after {
+  left: -10vw;
 }
 
 @media (max-width: 768px) {

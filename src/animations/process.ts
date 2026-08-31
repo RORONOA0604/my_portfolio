@@ -5,25 +5,102 @@ gsap.registerPlugin(ScrollTrigger)
 
 export function initProcessAnimation() {
   const section = document.querySelector<HTMLElement>(".process-section")
-  const progress = document.querySelector<HTMLElement>(".process-line-progress")
-  const progressText = document.querySelector<HTMLElement>(".process-progress")
-  const steps = gsap.utils.toArray<HTMLElement>("[data-process-step]")
-  const dots = gsap.utils.toArray<HTMLElement>("[data-process-dot]")
+  const progress = document.querySelector<HTMLElement>(
+    ".process-line-progress",
+  )
+  const progressText = document.querySelector<HTMLElement>(
+    ".process-progress",
+  )
 
-  if (!section || !progress || !progressText || !steps.length) {
+  const steps = gsap.utils.toArray<HTMLElement>(
+    "[data-process-step]",
+  )
+
+  const dots = gsap.utils.toArray<HTMLElement>(
+    "[data-process-dot]",
+  )
+
+  if (
+    !section ||
+    !progress ||
+    !progressText ||
+    steps.length === 0 ||
+    dots.length === 0
+  ) {
     return () => {}
   }
 
   const context = gsap.context(() => {
+    const totalSteps = steps.length
+    const stepDuration = 1
+
+    // ---------------------------------------------
+    // Initial state
+    // ---------------------------------------------
+
     gsap.set(steps, {
-      opacity: 0,
+      autoAlpha: 0,
       y: 50,
     })
 
     gsap.set(steps[0], {
-      opacity: 1,
+      autoAlpha: 1,
       y: 0,
     })
+
+    gsap.set(progress, {
+      height: "0%",
+    })
+
+    // ---------------------------------------------
+    // Helper for dot state
+    // ---------------------------------------------
+
+    const updateDots = (activeIndex: number) => {
+      dots.forEach((dot, dotIndex) => {
+        const circle =
+          dot.querySelector<HTMLElement>("span")
+
+        if (!circle) return
+
+        if (dotIndex < activeIndex) {
+          gsap.to(circle, {
+            scale: 1.15,
+            backgroundColor: "#f4f4f4",
+            borderColor: "#f4f4f4",
+            duration: 0.2,
+            overwrite: true,
+          })
+        } else if (dotIndex === activeIndex) {
+          gsap.to(circle, {
+            scale: 1.7,
+            backgroundColor: "#f4f4f4",
+            borderColor: "#f4f4f4",
+            duration: 0.25,
+            overwrite: true,
+          })
+        } else {
+          gsap.to(circle, {
+            scale: 1,
+            backgroundColor: "#080808",
+            borderColor: "rgba(244,244,244,0.35)",
+            duration: 0.2,
+            overwrite: true,
+          })
+        }
+      })
+
+      progressText.textContent =
+        `${String(activeIndex + 1).padStart(2, "0")} / ${String(totalSteps).padStart(2, "0")}`
+    }
+
+    updateDots(0)
+
+    let activeIndex = 0
+
+    // ---------------------------------------------
+    // Scroll timeline
+    // ---------------------------------------------
 
     const timeline = gsap.timeline({
       scrollTrigger: {
@@ -34,87 +111,80 @@ export function initProcessAnimation() {
         scrub: true,
         anticipatePin: 1,
         invalidateOnRefresh: true,
+
+        onUpdate: (self) => {
+          const index = Math.min(
+            totalSteps - 1,
+            Math.floor(self.progress * totalSteps),
+          )
+
+          if (index !== activeIndex) {
+            activeIndex = index
+            updateDots(activeIndex)
+          }
+        },
       },
     })
 
-    const stepDuration = 1
+    // ---------------------------------------------
+    // Step 1
+    // ---------------------------------------------
 
-    steps.forEach((step, index) => {
-      const number = step.dataset.processStep ?? "01"
-      
+    timeline.to(progress, {
+      height: `${(1 / totalSteps) * 100}%`,
+      duration: stepDuration,
+      ease: "none",
+    })
+
+    // ---------------------------------------------
+    // Remaining steps
+    // ---------------------------------------------
+
+    for (let index = 1; index < totalSteps; index++) {
+      const previousStep = steps[index - 1]
+      const currentStep = steps[index]
+
+      const startTime = index * stepDuration
+
+      // Previous step leaves
+      timeline.to(
+        previousStep,
+        {
+          autoAlpha: 0,
+          y: -50,
+          duration: 0.3,
+          ease: "none",
+        },
+        startTime,
+      )
+
+      // Current step enters
+      timeline.fromTo(
+        currentStep,
+        {
+          autoAlpha: 0,
+          y: 50,
+        },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.45,
+          ease: "none",
+        },
+        startTime + 0.25,
+      )
+
+      // Progress line
       timeline.to(
         progress,
         {
-          height: `${((index + 1) / steps.length) * 100}%`,
+          height: `${((index + 1) / totalSteps) * 100}%`,
           duration: stepDuration,
           ease: "none",
         },
-        index * stepDuration
+        startTime,
       )
-
-      // FIX: Changed from `.to` (0.01 duration) to `.set` for instantaneous text replacement
-      timeline.set(
-        progressText,
-        {
-          textContent: `${number} / 07`,
-        },
-        index * stepDuration
-      )
-
-      if (index > 0) {
-        timeline.to(
-          steps[index - 1],
-          {
-            opacity: 0,
-            y: -50,
-            duration: 0.35,
-            ease: "none",
-          },
-          index * stepDuration
-        )
-
-        timeline.to(
-          steps[index],
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.5,
-            ease: "none",
-          },
-          index * stepDuration + 0.2
-        )
-      }
-
-      dots.forEach((currentDot, dotIndex) => {
-        const dotCircle = currentDot.querySelector<HTMLElement>("span")
-
-        if (!dotCircle) return
-
-        if (dotIndex <= index) {
-          timeline.to(
-            dotCircle,
-            {
-              scale: dotIndex === index ? 1.7 : 1.15,
-              background: "#f4f4f4",
-              borderColor: "#f4f4f4",
-              duration: 0.25,
-            },
-            index * stepDuration
-          )
-        } else {
-          timeline.to(
-            dotCircle,
-            {
-              scale: 1,
-              background: "#080808",
-              borderColor: "rgba(244,244,244,0.35)",
-              duration: 0.25,
-            },
-            index * stepDuration
-          )
-        }
-      })
-    }) // FIX: Added the missing closing parenthesis here `})`
+    }
   }, section)
 
   return () => {

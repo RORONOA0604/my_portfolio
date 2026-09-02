@@ -4,10 +4,14 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 gsap.registerPlugin(ScrollTrigger)
 
 export function initProcessAnimation() {
-  const section = document.querySelector<HTMLElement>(".process-section")
+  const section = document.querySelector<HTMLElement>(
+    ".process-section",
+  )
+
   const progress = document.querySelector<HTMLElement>(
     ".process-line-progress",
   )
+
   const progressText = document.querySelector<HTMLElement>(
     ".process-progress",
   )
@@ -35,6 +39,24 @@ export function initProcessAnimation() {
     const stepDuration = 1
 
     // ---------------------------------------------
+    // Connectors
+    // ---------------------------------------------
+
+    const connectors = steps
+      .map((step) =>
+        step.querySelector<HTMLElement>(".process-connector"),
+      )
+      .filter(
+        (connector): connector is HTMLElement =>
+          connector !== null,
+      )
+
+    // Start every connector collapsed.
+    gsap.set(connectors, {
+      scaleX: 0,
+    })
+
+    // ---------------------------------------------
     // Initial state
     // ---------------------------------------------
 
@@ -53,7 +75,7 @@ export function initProcessAnimation() {
     })
 
     // ---------------------------------------------
-    // Helper for dot state
+    // Helper: update dot states
     // ---------------------------------------------
 
     const updateDots = (activeIndex: number) => {
@@ -91,7 +113,9 @@ export function initProcessAnimation() {
       })
 
       progressText.textContent =
-        `${String(activeIndex + 1).padStart(2, "0")} / ${String(totalSteps).padStart(2, "0")}`
+        `${String(activeIndex + 1).padStart(2, "0")} / ${String(
+          totalSteps,
+        ).padStart(2, "0")}`
     }
 
     updateDots(0)
@@ -127,7 +151,7 @@ export function initProcessAnimation() {
     })
 
     // ---------------------------------------------
-    // Step 1
+    // STEP 01
     // ---------------------------------------------
 
     timeline.to(progress, {
@@ -136,17 +160,28 @@ export function initProcessAnimation() {
       ease: "none",
     })
 
+    timeline.to(
+      connectors[0],
+      {
+        scaleX: 1,
+        duration: 0.45,
+        ease: "none",
+      },
+      0.25,
+    )
+
     // ---------------------------------------------
-    // Remaining steps
+    // STEPS 02 → 07
     // ---------------------------------------------
 
     for (let index = 1; index < totalSteps; index++) {
       const previousStep = steps[index - 1]
       const currentStep = steps[index]
+      const connector = connectors[index]
 
       const startTime = index * stepDuration
 
-      // Previous step leaves
+      // Previous step exits.
       timeline.to(
         previousStep,
         {
@@ -158,7 +193,7 @@ export function initProcessAnimation() {
         startTime,
       )
 
-      // Current step enters
+      // Current step enters.
       timeline.fromTo(
         currentStep,
         {
@@ -174,7 +209,7 @@ export function initProcessAnimation() {
         startTime + 0.25,
       )
 
-      // Progress line
+      // Progress line advances.
       timeline.to(
         progress,
         {
@@ -184,6 +219,19 @@ export function initProcessAnimation() {
         },
         startTime,
       )
+
+      // Matching connector draws from the spine outward.
+      if (connector) {
+        timeline.to(
+          connector,
+          {
+            scaleX: 1,
+            duration: 0.4,
+            ease: "none",
+          },
+          startTime + 0.25,
+        )
+      }
     }
   }, section)
 

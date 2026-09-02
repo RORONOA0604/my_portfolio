@@ -27,28 +27,33 @@ function Process() {
         </div>
 
         <div className="process-steps">
-          {processSteps.map((step) => (
-            <article
-              className={`process-step process-step-${step.side}`}
-              data-process-step={step.number}
-              key={step.number}
-            >
-              <p className="process-number">{step.number}</p>
+  {processSteps.map((step, index) => (
+    <article
+      className={`process-step process-step-${step.side}`}
+      data-process-step={step.number}
+      data-process-index={index}
+      key={step.number}
+    >
+      <div className="process-connector" />
 
-              <h2>{step.title}</h2>
+      <div className="process-content">
+        <p className="process-number">{step.number}</p>
 
-              <p className="process-description">
-                {step.description}
-              </p>
+        <h2>{step.title}</h2>
 
-              <div className="process-tags">
-                {step.tags.map((tag) => (
-                  <span key={tag}>{tag}</span>
-                ))}
-              </div>
-            </article>
+        <p className="process-description">
+          {step.description}
+        </p>
+
+        <div className="process-tags">
+          {step.tags.map((tag) => (
+            <span key={tag}>{tag}</span>
           ))}
         </div>
+      </div>
+    </article>
+  ))}
+</div>
       </div>
     </section>
   )

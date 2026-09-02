@@ -123,6 +123,10 @@ body {
   transform-origin: top;
 }
 
+/* =========================================
+   PROCESS SECTION
+   ========================================= */
+
 .process-section {
   position: relative;
   height: 100vh;
@@ -137,6 +141,7 @@ body {
   top: 48px;
   left: 5vw;
   right: 5vw;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -159,6 +164,10 @@ body {
   height: 100%;
 }
 
+/* =========================================
+   CENTRAL TIMELINE
+   ========================================= */
+
 .process-line {
   position: absolute;
   top: 16%;
@@ -174,10 +183,10 @@ body {
   top: 0;
   left: 0;
   width: 1px;
-  height: 100%;
 }
 
 .process-line-track {
+  height: 100%;
   background: rgba(244, 244, 244, 0.15);
 }
 
@@ -187,34 +196,47 @@ body {
   transform-origin: top;
 }
 
+/* =========================================
+   DOTS
+   ========================================= */
+
 .process-dots {
   position: absolute;
   inset: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+
+  display: grid;
+  grid-template-rows: repeat(7, minmax(0, 1fr));
 }
 
 .process-dot {
   position: relative;
+
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+
+  align-self: center;
+
   width: 17px;
   height: 17px;
   margin-left: -8px;
+
+  z-index: 20;
 }
 
 .process-dot span {
   width: 7px;
   height: 7px;
+
   border: 1px solid rgba(244, 244, 244, 0.35);
   border-radius: 50%;
+
   background: #080808;
+
   transition:
-    transform 0.3s ease,
-    background 0.3s ease,
-    border-color 0.3s ease;
+    transform 0.25s ease,
+    background-color 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .process-dot:first-child span {
@@ -223,50 +245,78 @@ body {
   background: #f4f4f4;
 }
 
+/* =========================================
+   PROCESS CONTENT
+   ========================================= */
+
 .process-steps {
   position: absolute;
-  inset: 0;
+  top: 16%;
+  right: 0;
+  bottom: 10%;
+  left: 0;
+
+  display: grid;
+  grid-template-rows: repeat(7, minmax(0, 1fr));
 }
 
 .process-step {
-  position: absolute;
-  top: 50%;
+  position: relative;
+
+  align-self: center;
+
   width: min(32vw, 460px);
-  transform: translateY(-50%);
-  opacity: 0;
-  visibility: hidden;
+
   will-change: transform, opacity;
 }
 
+/* LEFT SIDE */
+
 .process-step-left {
-  left: 8vw;
+  justify-self: start;
+  margin-left: 7vw;
   text-align: right;
 }
-
+/* RIGHT SIDE */
 .process-step-right {
-  right: 8vw;
+  justify-self: end;
+  margin-right: 7vw;
   text-align: left;
+}
+
+/* =========================================
+   CONTENT
+   ========================================= */
+
+.process-content {
+  width: 100%;
 }
 
 .process-number {
   margin-bottom: 12px;
+
   font-size: 11px;
   letter-spacing: 0.16em;
+
   color: rgba(244, 244, 244, 0.4);
 }
 
 .process-step h2 {
   margin-bottom: 20px;
+
   font-size: clamp(3.5rem, 6vw, 7rem);
   line-height: 0.82;
+
   font-weight: 700;
   letter-spacing: -0.075em;
 }
 
 .process-description {
   max-width: 380px;
+
   font-size: 14px;
   line-height: 1.6;
+
   color: rgba(244, 244, 244, 0.6);
 }
 
@@ -274,10 +324,15 @@ body {
   margin-left: auto;
 }
 
+/* =========================================
+   TAGS
+   ========================================= */
+
 .process-tags {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+
   margin-top: 24px;
 }
 
@@ -287,29 +342,42 @@ body {
 
 .process-tags span {
   padding: 6px 10px;
+
   border: 1px solid rgba(244, 244, 244, 0.12);
   border-radius: 999px;
+
   font-size: 9px;
   letter-spacing: 0.08em;
+
   color: rgba(244, 244, 244, 0.4);
 }
-.process-step::after {
-  content: "";
+
+/* =========================================
+   CONNECTORS
+   ========================================= */
+
+.process-connector {
   position: absolute;
   top: 50%;
-  width: 10vw;
+
+  width: calc(43vw - min(32vw, 460px));
   height: 1px;
-  background: rgba(244, 244, 244, 0.22);
-  transform: translateY(-50%);
+
+  background: rgba(244, 244, 244, 0.25);
+
+  transform: translateY(-50%) scaleX(0);
+
   pointer-events: none;
 }
 
-.process-step-left::after {
-  right: -10vw;
+.process-step-left .process-connector {
+  left: 100%;
+  transform-origin: right center;
 }
 
-.process-step-right::after {
-  left: -10vw;
+.process-step-right .process-connector {
+  right: 100%;
+  transform-origin: left center;
 }
 
 @media (max-width: 768px) {
@@ -357,30 +425,41 @@ body {
     left: 12%;
   }
 
-  .process-step {
-    left: 22%;
-    right: 7%;
-    width: auto;
-    text-align: left;
-  }
+  .process-steps {
+  top: 17%;
+  right: 0;
+  bottom: 12%;
+  left: 0;
 
-  .process-step-left,
-  .process-step-right {
-    left: 22%;
-    right: 7%;
-    text-align: left;
-  }
+  grid-template-rows: repeat(7, minmax(0, 1fr));
+}
 
-  .process-step-left .process-description {
-    margin-left: 0;
-  }
+.process-step {
+  width: auto;
+  margin: 0;
+  padding-left: 22%;
+  padding-right: 7%;
+}
 
-  .process-step-left .process-tags {
-    justify-content: flex-start;
-  }
+.process-step-left,
+.process-step-right {
+  justify-self: stretch;
+  margin: 0;
+  text-align: left;
+}
 
-  .process-step h2 {
-    font-size: clamp(3rem, 15vw, 6rem);
-  }
+.process-step-left .process-description {
+  margin-left: 0;
+}
 
+.process-step-left .process-tags {
+  justify-content: flex-start;
+}
+
+/* Hide horizontal connectors on narrow screens.
+   The central timeline remains the primary visual anchor. */
+
+.process-connector {
+  display: none;
+}
 }
